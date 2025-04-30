@@ -22,18 +22,20 @@ function createVerticalSlider(slides, direction = 'top_bottom', columns = 3) {
     track.className = 'vertical-track';
 
     // Add slides (original set + duplicate for seamless loop)
-    slides.forEach((slide) => {
+    slides.forEach((slide, index) => {
       const slideElement = document.createElement('div');
       slideElement.className = 'slide';
       slideElement.textContent = slide;
+      slideElement.dataset.slideId = index; // Add data attribute for binding
       track.appendChild(slideElement);
     });
 
     // Add duplicate slides
-    slides.forEach((slide) => {
+    slides.forEach((slide, index) => {
       const slideElement = document.createElement('div');
       slideElement.className = 'slide';
       slideElement.textContent = slide;
+      slideElement.dataset.slideId = index; // Add data attribute for binding
       track.appendChild(slideElement);
     });
 
@@ -42,14 +44,37 @@ function createVerticalSlider(slides, direction = 'top_bottom', columns = 3) {
     section.appendChild(wrapper);
   }
 
+  // Create the slide list
+  const slideList = document.getElementById('slide-list-items');
+  slides.forEach((slide, index) => {
+    const listItem = document.createElement('li');
+    listItem.textContent = slide;
+    listItem.dataset.slideId = index; // Match the data attribute with slides
+
+    // Add hover events
+    listItem.addEventListener('mouseenter', () => {
+      const slideId = listItem.dataset.slideId;
+      document.querySelectorAll(`.slide[data-slide-id="${slideId}"]`).forEach((slide) => {
+        slide.classList.add('hovered');
+      });
+    });
+
+    listItem.addEventListener('mouseleave', () => {
+      const slideId = listItem.dataset.slideId;
+      document.querySelectorAll(`.slide[data-slide-id="${slideId}"]`).forEach((slide) => {
+        slide.classList.remove('hovered');
+      });
+    });
+
+    slideList.appendChild(listItem);
+  });
+
   // Add the section to the body (or you can specify a different container)
-  document.body.appendChild(section);
+  document.querySelector('.container').insertBefore(section, document.querySelector('.slide-list'));
 }
 
 // Example usage:
 document.addEventListener('DOMContentLoaded', () => {
-  // Create slides array
-
   const mySlides = [
     'Product 1',
     'Product 2',
