@@ -16,7 +16,7 @@
   height: 500px;
   overflow: hidden;
   position: relative;
-  width: 400px;
+  width: fit-content;
   padding: 0 32px;
 }
 
@@ -30,14 +30,16 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 100%;
+
   color: white;
   font-size: 4rem;
   padding: 2rem 0;
   text-align: center;
-  height: 200px;
+  width: 140px;
+  aspect-ratio: 1/2;
   border-radius: 16px;
   border: 1px solid white;
+  
 }
 
 .vertical-track {
@@ -46,11 +48,12 @@
   animation: vertical-scroll 40s linear infinite reverse;
   gap: 32px;
   height: calc((200px + 32px) * 12 * 2);
+  width: fit-content;
 }
 
 .vertical-marquee-wrapper[direction="top_bottom"] .vertical-track {
   animation: vertical-scroll 40s linear infinite;
-
+  width: fit-content;
   height: auto;
 }
 

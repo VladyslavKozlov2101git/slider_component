@@ -1,9 +1,11 @@
-// script.js
 function createVerticalSlider(slides, direction = 'top_bottom', columns = 3) {
   // Create the main container section
   const section = document.createElement('section');
   section.className = 'columns';
   section.id = 'my_own_library';
+
+  // Calculate how many slides each column should have for unique viewport display
+  const slidesPerColumn = Math.ceil(slides.length / columns);
 
   // Create columns with sliders
   for (let i = 0; i < columns; i++) {
@@ -21,21 +23,28 @@ function createVerticalSlider(slides, direction = 'top_bottom', columns = 3) {
     const track = document.createElement('div');
     track.className = 'vertical-track';
 
+    // Get the slides for this specific column
+    const columnSlides = [];
+    for (let j = 0; j < slidesPerColumn; j++) {
+      const slideIndex = (i * slidesPerColumn + j) % slides.length;
+      columnSlides.push(slides[slideIndex]);
+    }
+
     // Add slides (original set + duplicate for seamless loop)
-    slides.forEach((slide, index) => {
+    columnSlides.forEach((slide, index) => {
       const slideElement = document.createElement('div');
       slideElement.className = 'slide';
       slideElement.textContent = slide;
-      slideElement.dataset.slideId = index; // Add data attribute for binding
+      slideElement.dataset.slideId = (i * slidesPerColumn + index) % slides.length;
       track.appendChild(slideElement);
     });
 
     // Add duplicate slides
-    slides.forEach((slide, index) => {
+    columnSlides.forEach((slide, index) => {
       const slideElement = document.createElement('div');
       slideElement.className = 'slide';
       slideElement.textContent = slide;
-      slideElement.dataset.slideId = index; // Add data attribute for binding
+      slideElement.dataset.slideId = (i * slidesPerColumn + index) % slides.length;
       track.appendChild(slideElement);
     });
 
@@ -69,11 +78,9 @@ function createVerticalSlider(slides, direction = 'top_bottom', columns = 3) {
     slideList.appendChild(listItem);
   });
 
-  // Add the section to the body (or you can specify a different container)
   document.querySelector('.container').insertBefore(section, document.querySelector('.slide-list'));
 }
 
-// Example usage:
 document.addEventListener('DOMContentLoaded', () => {
   const mySlides = [
     'Product 1',
@@ -85,6 +92,12 @@ document.addEventListener('DOMContentLoaded', () => {
     'Offer 3',
     'Service C',
     'Offer C',
+    'New Item 1',
+    'Another Great Item',
+    'Special Deal',
+    'Product 4',
+    'Ocean Deal',
+    'New Item 3',
   ];
   createVerticalSlider(mySlides, 'alternate', 3);
 });
