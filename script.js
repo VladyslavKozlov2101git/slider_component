@@ -1,103 +1,75 @@
-function createVerticalSlider(slides, direction = 'top_bottom', columns = 3) {
-  // Create the main container section
-  const section = document.createElement('section');
-  section.className = 'columns';
-  section.id = 'my_own_library';
-
-  // Calculate how many slides each column should have for unique viewport display
-  const slidesPerColumn = Math.ceil(slides.length / columns);
-
-  // Create columns with sliders
-  for (let i = 0; i < columns; i++) {
-    // Alternate direction for each column if not specified
-    const columnDirection =
-      direction === 'alternate' ? (i % 2 === 0 ? 'top_bottom' : 'bottom_top') : direction;
-
-    const wrapper = document.createElement('div');
-    wrapper.className = 'vertical-marquee-wrapper';
-    wrapper.setAttribute('direction', columnDirection);
-
-    const marquee = document.createElement('div');
-    marquee.className = 'vertical-marquee';
-
-    const track = document.createElement('div');
-    track.className = 'vertical-track';
-
-    // Get the slides for this specific column
-    const columnSlides = [];
-    for (let j = 0; j < slidesPerColumn; j++) {
-      const slideIndex = (i * slidesPerColumn + j) % slides.length;
-      columnSlides.push(slides[slideIndex]);
-    }
-
-    // Add slides (original set + duplicate for seamless loop)
-    columnSlides.forEach((slide, index) => {
-      const slideElement = document.createElement('div');
-      slideElement.className = 'slide';
-      slideElement.textContent = slide;
-      slideElement.dataset.slideId = (i * slidesPerColumn + index) % slides.length;
-      track.appendChild(slideElement);
-    });
-
-    // Add duplicate slides
-    columnSlides.forEach((slide, index) => {
-      const slideElement = document.createElement('div');
-      slideElement.className = 'slide';
-      slideElement.textContent = slide;
-      slideElement.dataset.slideId = (i * slidesPerColumn + index) % slides.length;
-      track.appendChild(slideElement);
-    });
-
-    marquee.appendChild(track);
-    wrapper.appendChild(marquee);
-    section.appendChild(wrapper);
+// Функція для генерації списку з 12 елементів
+function generateItems() {
+  const items = [];
+  for (let i = 1; i <= 12; i++) {
+    items.push(`Елемент ${i}`);
   }
-
-  // Create the slide list
-  const slideList = document.getElementById('slide-list-items');
-  slides.forEach((slide, index) => {
-    const listItem = document.createElement('li');
-    listItem.textContent = slide;
-    listItem.dataset.slideId = index; // Match the data attribute with slides
-
-    // Add hover events
-    listItem.addEventListener('mouseenter', () => {
-      const slideId = listItem.dataset.slideId;
-      document.querySelectorAll(`.slide[data-slide-id="${slideId}"]`).forEach((slide) => {
-        slide.classList.add('hovered');
-      });
-    });
-
-    listItem.addEventListener('mouseleave', () => {
-      const slideId = listItem.dataset.slideId;
-      document.querySelectorAll(`.slide[data-slide-id="${slideId}"]`).forEach((slide) => {
-        slide.classList.remove('hovered');
-      });
-    });
-
-    slideList.appendChild(listItem);
-  });
-
-  document.querySelector('.container').insertBefore(section, document.querySelector('.slide-list'));
+  return items;
 }
 
-document.addEventListener('DOMContentLoaded', () => {
-  const mySlides = [
-    'Product 1',
-    'Product 2',
-    'Service A',
-    'Offer 1',
-    'Service B',
-    'Offer 2',
-    'Offer 3',
-    'Service C',
-    'Offer C',
-    'New Item 1',
-    'Another Great Item',
-    'Special Deal',
-    'Product 4',
-    'Ocean Deal',
-    'New Item 3',
-  ];
-  createVerticalSlider(mySlides, 'alternate', 3);
-});
+// Функція для створення слайду
+function createSlide(text, id) {
+  const slide = document.createElement('div');
+  slide.className = 'slide';
+  slide.id = id;
+  slide.textContent = text;
+  return slide;
+}
+
+// Функція для створення колонки слайдера з marquee ефектом
+function createMarqueeColumn(items, direction, startIndex) {
+  const column = document.createElement('div');
+  column.className = 'marquee-column';
+
+  // Подвоюємо масив для безперервного ефекту
+  const doubledItems = [...items, ...items];
+
+  // Створюємо контейнер для слайдів
+  const slidesContainer = document.createElement('div');
+  slidesContainer.className = 'marquee-container';
+  slidesContainer.style.flexDirection = direction === 'down' ? 'column' : 'column-reverse';
+
+  // Додаємо слайди
+  doubledItems.forEach((item, index) => {
+    const slide = createSlide(item, `slide-${direction}-${index}`);
+    slidesContainer.appendChild(slide);
+  });
+
+  column.appendChild(slidesContainer);
+
+  // Налаштування анімації
+  const duration = items.length * 5; // Час для одного циклу в секундах
+  slidesContainer.style.animation = `marquee-${direction} ${duration}s linear infinite`;
+
+  return column;
+}
+
+// Основна функція ініціалізації
+function initSlider() {
+  const items = generateItems();
+  const sliderContainer = document.getElementById('sliderContainer');
+  const itemsList = document.getElementById('itemsList');
+
+  // Відображення списку елементів
+  items.forEach((item) => {
+    const li = document.createElement('li');
+    li.textContent = item;
+    itemsList.appendChild(li);
+  });
+
+  // Створення 4 колонок з різними напрямками
+  for (let i = 0; i < 4; i++) {
+    // Тасуємо елементи для кожної колонки
+    const shuffledItems = [...items].sort(() => Math.random() - 0.5);
+
+    // Визначаємо напрямок (чергування)
+    const direction = i % 2 === 0 ? 'down' : 'up';
+
+    // Створюємо колонку
+    const column = createMarqueeColumn(shuffledItems, direction, i * 3);
+    sliderContainer.appendChild(column);
+  }
+}
+
+// Ініціалізація слайдера при завантаженні сторінки
+window.onload = initSlider;
